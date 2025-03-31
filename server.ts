@@ -1,10 +1,11 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import agenda from "./lib/agenda";
 import app from "./express";
 import connectToDatabase from "./lib/mongoose";
-import dotenv from "dotenv";
 import { QUERY_USER_BIRTHDAY_AGENDA_INTERVAL } from "./constants/scheduler";
 
-dotenv.config();
 connectToDatabase();
 
 const port: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
