@@ -1,5 +1,8 @@
 import { getTimeZones } from "@vvo/tzdb";
-import { PUSH_NOTIF_TIME_HHMMSS } from "../constants/scheduler";
+import {
+  PUSH_NOTIF_TIME,
+  PUSH_NOTIF_TIME_HHMMSS,
+} from "../constants/scheduler";
 
 const getOffsetHourFromTimezone = (timezone: string): number => {
   const timezones = getTimeZones();
@@ -23,7 +26,10 @@ const convertOffsetToString = (offset: number): string => {
   )}`;
 };
 
-const getOffsetHourOnString = (timezone: string, birthdayYYYYMMDD: string): Date => {
+const getOffsetHourOnString = (
+  timezone: string,
+  birthdayYYYYMMDD: string
+): Date => {
   const offsetInHours = getOffsetHourFromTimezone(timezone);
   const offsetInString = convertOffsetToString(offsetInHours);
 
@@ -33,8 +39,41 @@ const getOffsetHourOnString = (timezone: string, birthdayYYYYMMDD: string): Date
   return timestamp;
 };
 
+const getTodayAndTomorrowDateString = () => {
+  const today = new Date();
+  const todayString = today.toISOString().split("T")[0];
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const tomorrowString = tomorrow.toISOString().split("T")[0];
+
+  return {
+    today: todayString,
+    tomorrow: tomorrowString,
+  };
+};
+
+const isTodayBirthdayUser = (
+  timezone: string,
+  birthdayYYYYMMDD: string
+): boolean => {
+  const offsetInHours = getOffsetHourFromTimezone(timezone);
+  let isTodayBirthdayUTCReference = false;
+
+  const { today, tomorrow } = getTodayAndTomorrowDateString();
+
+  if (offsetInHours < PUSH_NOTIF_TIME) {
+    isTodayBirthdayUTCReference = birthdayYYYYMMDD === today;
+  } else {
+    isTodayBirthdayUTCReference = birthdayYYYYMMDD === tomorrow;
+  }
+  return isTodayBirthdayUTCReference;
+};
+
 export {
   getOffsetHourFromTimezone,
   convertOffsetToString,
   getOffsetHourOnString,
+  getTodayAndTomorrowDateString,
+  isTodayBirthdayUser,
 };

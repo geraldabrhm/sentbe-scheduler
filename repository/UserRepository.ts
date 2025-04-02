@@ -1,5 +1,8 @@
 import { PUSH_NOTIF_TIME } from "../constants/scheduler";
-import { getOffsetHourFromTimezone } from "../helpers/TimeHelper";
+import {
+  getTodayAndTomorrowDateString,
+  isTodayBirthdayUser,
+} from "../helpers/TimeHelper";
 import User from "../models/User";
 
 /**
@@ -7,26 +10,17 @@ import User from "../models/User";
  * @returns
  */
 const getTodayBirthdayUsers = async () => {
-  const today = new Date();
-  const todayString = today.toISOString().split("T")[0];
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const tomorrowString = tomorrow.toISOString().split("T")[0];
+  const { today, tomorrow } = getTodayAndTomorrowDateString();
 
   const todayBirthdayUser = await User.find({
-    birthday: { $gte: todayString, $lte: tomorrowString },
+    birthday: { $gte: today, $lte: tomorrow },
   });
 
   const todayBirthdayUserUTCReference = todayBirthdayUser.filter((user) => {
-    const offsetInHours = getOffsetHourFromTimezone(user.timezone);
-    let isTodayBirthdayUTCReference = false;
-
-    if (offsetInHours < PUSH_NOTIF_TIME) {
-      isTodayBirthdayUTCReference = user.birthday === todayString;
-    } else {
-      isTodayBirthdayUTCReference = user.birthday === tomorrowString;
-    }
+    const isTodayBirthdayUTCReference = isTodayBirthdayUser(
+      user.timezone,
+      user.birthday
+    );
     return isTodayBirthdayUTCReference;
   });
 

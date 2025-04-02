@@ -2,7 +2,10 @@ import User from "../models/User";
 import { ServiceOutput } from "../models/ServiceOutput";
 import { getTodayBirthdayUsers } from "../repository/UserRepository";
 import agenda from "../lib/agenda";
-import { getOffsetHourOnString } from "../helpers/TimeHelper";
+import {
+  getOffsetHourOnString,
+  isTodayBirthdayUser,
+} from "../helpers/TimeHelper";
 
 const SUCCESS_REGISTER_MESSAGE = "User registered successfully";
 const ERROR_COMMON_REGISTER_MESSAGE = "User registration failed";
@@ -24,10 +27,9 @@ export const registerUser = async (
 
     await user.save();
 
-    const todayBirthdayUser = await getTodayBirthdayUsers();
-
-    const isBirthdayUserToday = todayBirthdayUser.some(
-      (user) => user.userId === user.userId
+    const isBirthdayUserToday = isTodayBirthdayUser(
+      user.timezone,
+      user.birthday
     );
 
     if (isBirthdayUserToday) {
