@@ -1,5 +1,8 @@
 import User from "../models/User";
 import { ServiceOutput } from "../models/ServiceOutput";
+import { getTodayBirthdayUsers } from "../repository/UserRepository";
+import agenda from "../lib/agenda";
+import { getOffsetHourOnString } from "../helpers/TimeHelper";
 
 const SUCCESS_REGISTER_MESSAGE = "User registered successfully";
 const ERROR_COMMON_REGISTER_MESSAGE = "User registration failed";
@@ -20,6 +23,28 @@ export const registerUser = async (
     });
 
     await user.save();
+
+    const todayBirthdayUser = await getTodayBirthdayUsers();
+
+    const isBirthdayUserToday = todayBirthdayUser.some(
+      (user) => user.userId === user.userId
+    );
+
+    if (isBirthdayUserToday) {
+      const pushNotifTime9UserTimezone = getOffsetHourOnString(
+        user.timezone,
+        user.birthday
+      );
+      await agenda.schedule(
+        pushNotifTime9UserTimezone,
+        "sendEmailToBirthdayUser",
+        {
+          email: user.email,
+          name: user.name,
+          birthday: user.birthday,
+        }
+      );
+    }
 
     return {
       success: true,

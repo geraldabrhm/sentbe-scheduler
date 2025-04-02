@@ -1,5 +1,4 @@
 import { Router, Request, Response } from "express";
-import { getTodayBirthdayUsers } from "../repository/UserRepository";
 
 const IndexRoute = Router();
 

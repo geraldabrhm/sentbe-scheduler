@@ -1,4 +1,5 @@
 import { getTimeZones } from "@vvo/tzdb";
+import { PUSH_NOTIF_TIME_HHMMSS } from "../constants/scheduler";
 
 const getOffsetHourFromTimezone = (timezone: string): number => {
   const timezones = getTimeZones();
@@ -22,4 +23,18 @@ const convertOffsetToString = (offset: number): string => {
   )}`;
 };
 
-export { getOffsetHourFromTimezone, convertOffsetToString };
+const getOffsetHourOnString = (timezone: string, birthdayYYYYMMDD: string): Date => {
+  const offsetInHours = getOffsetHourFromTimezone(timezone);
+  const offsetInString = convertOffsetToString(offsetInHours);
+
+  const timestamp = new Date(
+    `${birthdayYYYYMMDD}T${PUSH_NOTIF_TIME_HHMMSS}${offsetInString}`
+  );
+  return timestamp;
+};
+
+export {
+  getOffsetHourFromTimezone,
+  convertOffsetToString,
+  getOffsetHourOnString,
+};

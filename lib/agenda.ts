@@ -1,8 +1,7 @@
 import Agenda from "agenda";
 import { getTodayBirthdayUsers } from "../repository/UserRepository";
 import {
-  convertOffsetToString,
-  getOffsetHourFromTimezone,
+  getOffsetHourOnString,
 } from "../helpers/TimeHelper";
 import { PUSH_NOTIF_TIME_HHMMSS } from "../constants/scheduler";
 import { sendEmail } from "./nodemailer";
@@ -18,13 +17,10 @@ agenda.define("addTodaysPushNotifTask", async (job: any) => {
   const users = await getTodayBirthdayUsers();
 
   users.forEach(async (user: any) => {
-    const userTimezoneOffsetInHours = getOffsetHourFromTimezone(user.timezone);
-    const offsetInString = convertOffsetToString(userTimezoneOffsetInHours);
-
-    const pushNotifTime9UserTimezone = new Date(
-      `${user.birthday}T${PUSH_NOTIF_TIME_HHMMSS}${offsetInString}`
+    const pushNotifTime9UserTimezone = getOffsetHourOnString(
+      user.timezone,
+      user.birthday
     );
-
     await agenda.schedule(
       pushNotifTime9UserTimezone,
       "sendEmailToBirthdayUser",
@@ -44,4 +40,5 @@ agenda.define("sendEmailToBirthdayUser", async (job: any) => {
     `Happy birthday ${job.attrs.data.name}, we wish you all the best on your special day!`
   );
 });
+
 export default agenda;
