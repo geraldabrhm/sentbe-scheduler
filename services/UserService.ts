@@ -14,7 +14,7 @@ const ERROR_DUPLICATE_EMAIL_MESSAGE = "Email already exists";
 export const registerUser = async (
   email: string,
   name: string,
-  birthday: Date,
+  birthday: string,
   timezone: string
 ): Promise<ServiceOutput> => {
   try {
