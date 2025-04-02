@@ -6,7 +6,7 @@
   "scripts": {
     "test:unit": "jest",
     "test:e2e": "jest --testPathPattern=__test__/e2e/",
-    "dev:local": "nodemon server.ts",
+    "dev:local": "cp .env.development .env && nodemon server.ts",
     "db:local": "mongod --dbpath ~/mongodb-macos-aarch64-8.0.6/data/db",
     "build": "npx tsc",
     "deploy": "sh script/build.sh"

@@ -1,12 +1,31 @@
 version: "3.4"
 
 services:
-  dana-modal-app:
-    image: dana-modal-be-app
+  sentbe-birthday-scheduler-app:
+    image: sentbe-birthday-scheduler
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
     ports:
-      - "8081:8081"
+      - "3000:3000"
+    depends_on:
+      - sentbe-mongodb
+    networks:
+      - sentbe-network
+  sentbe-mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - sentbe-network
+    volumes:
+      - mongo-data:/data/db
+networks:
+  sentbe-network:
+    driver: bridge
+volumes:
+  mongo-data:
+    driver: local  
+
