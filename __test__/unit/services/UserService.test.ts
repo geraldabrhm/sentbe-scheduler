@@ -5,6 +5,7 @@ import {
   getProfile,
   registerUser,
   removeUser,
+  updateUser,
 } from "../../../services/UserService";
 import agenda from "../../../lib/agenda";
 
@@ -200,5 +201,80 @@ describe("removeUser", () => {
 
     expect(result.success).toBe(false);
     expect(result.status).toBe(500);
+  });
+});
+
+describe("updateUser", () => {
+  let mongoServer: MongoMemoryServer;
+
+  beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    await mongoose.connect(mongoServer.getUri());
+  });
+
+  afterAll(async () => {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
+    await mongoServer.stop();
+  });
+
+  beforeEach(async () => {
+    await User.deleteMany({});
+  });
+
+  it("should update a user successfully", async () => {
+    await User.create({
+      userId: "12345",
+      email: "user@example.com",
+      name: "Test User",
+      birthday: "1990-01-01",
+      timezone: "Asia/Jakarta",
+    });
+
+    const result = await updateUser(
+      "12345",
+      "new@example.com",
+      "New Name",
+      "1995-05-05",
+      "Asia/Bangkok"
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.status).toBe(200);
+    expect(result.data).toMatchObject({
+      email: "new@example.com",
+      name: "New Name",
+      birthday: "1995-05-05",
+      timezone: "Asia/Bangkok",
+    });
+  });
+
+  it("should return 404 if user does not exist", async () => {
+    const result = await updateUser(
+      "nonexistent",
+      "new@example.com",
+      "New Name",
+      "1995-05-05",
+      "Asia/Bangkok"
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.status).toBe(404);
+  });
+
+  it("should return 400 on invalid data format", async () => {
+    const result = await updateUser(
+      "12345",
+      "invalid-email",
+      "",
+      "invalid-date",
+      ""
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.status).toBe(400);
+    expect(result.message).toBe(
+      "Validation failed: timezone: Path `timezone` is required., birthday: invalid-date is not a valid date! Use the format YYYY-MM-DD., name: Path `name` is required., email: invalid-email is not a valid email address!"
+    );
   });
 });

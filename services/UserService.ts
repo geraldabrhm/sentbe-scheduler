@@ -1,6 +1,5 @@
 import User from "../models/User";
 import { ServiceOutput } from "../models/ServiceOutput";
-import { getTodayBirthdayUsers } from "../repository/UserRepository";
 import agenda from "../lib/agenda";
 import {
   getOffsetHourOnString,
@@ -160,7 +159,7 @@ export const updateUser = async (
   userId: string,
   email: string,
   name: string,
-  birthday: Date,
+  birthday: string,
   timezone: string
 ): Promise<ServiceOutput> => {
   try {
