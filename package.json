@@ -4,8 +4,9 @@
   "description": "Base Repository for Backend Using JWT Authentication",
   "main": "server.ts",
   "scripts": {
-    "test:unit": "jest",
-    "test:e2e": "jest --testPathPattern=__test__/e2e/",
+    "test:unit": "jest --testPathPattern=__test__/unit/",
+    "test:e2e": "jest --testPathPattern=__test__/e2e/ --forceExit",
+    "test:e2e-watch": "jest --testPathPattern=__test__/e2e/ --detectOpenHandles --forceExit --watch",
     "dev:local": "cp .env.development .env && nodemon server.ts",
     "db:local": "mongod --dbpath ~/mongodb-macos-aarch64-8.0.6/data/db",
     "build": "npx tsc",

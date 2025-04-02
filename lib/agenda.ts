@@ -1,9 +1,11 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import Agenda from "agenda";
 import { getTodayBirthdayUsers } from "../repository/UserRepository";
 import {
   getOffsetHourOnString,
 } from "../helpers/TimeHelper";
-import { PUSH_NOTIF_TIME_HHMMSS } from "../constants/scheduler";
 import { sendEmail } from "./nodemailer";
 
 const databaseUri = process.env.DATABASE_URI + "member";

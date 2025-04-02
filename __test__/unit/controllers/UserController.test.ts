@@ -67,6 +67,40 @@ describe("UserController", () => {
       });
     });
 
+    it("should return failed if email invalid", async () => {
+      req.body = {
+        email: "invalid-email",
+        name: "Test User",
+        birthday: "1990-01-01",
+        timezone: "UTC",
+      };
+
+      const mockServiceResponse = {
+        success: false,
+        message: "Invalid email format",
+        data: null,
+        status: 400,
+      };
+
+      (UserService.registerUser as jest.Mock).mockResolvedValue(
+        mockServiceResponse
+      );
+
+      await registerUserController(req, res);
+      expect(UserService.registerUser).toHaveBeenCalledWith(
+        "invalid-email",
+        "Test User",
+        "1990-01-01",
+        "UTC"
+      );
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Invalid email format",
+        data: null,
+      });
+    });
+
     it("should not set cookie when status is not 201", async () => {
       req.body = {
         email: "test@example.com",
