@@ -65,6 +65,7 @@ npm install
 2. Start the application:
 
 ```bash
+npm run db:local
 npm run dev:local
 ```
 
@@ -84,16 +85,10 @@ npm run test:unit
 
 To deploy the application using Docker:
 
-1. Build the Docker image:
+1. Build and run the Docker container:
 
 ```bash
-docker build -t sentbe-scheduler .
-```
-
-2. Run the Docker container:
-
-```bash
-docker run -p 3000:3000 --env-file .env sentbe-scheduler
+docker compose up
 ```
 
 The application will now be running in a containerized environment.
