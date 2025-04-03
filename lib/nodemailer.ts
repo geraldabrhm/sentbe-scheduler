@@ -22,6 +22,7 @@ const sendEmail = async (to: string, subject: string, text: string) => {
     console.log("[Nodemailer] Email sent successfully", response);
   } catch (error) {
     console.error("[Nodemailer] Error sending email", error);
+    throw new Error("Failed to send email");
   }
 };
 

@@ -70,8 +70,9 @@ agenda.define("sendEmailToBirthdayUser", async (job: any) => {
       error
     );
 
+    const oneHourFromNow = new Date(Date.now() + ONE_HOUR_IN_MILLISECOND);
     await agenda.schedule(
-      job.attrs.data.timestamp + ONE_HOUR_IN_MILLISECOND,
+      oneHourFromNow,
       "sendEmailToBirthdayUser",
       job.attrs.data
     );
