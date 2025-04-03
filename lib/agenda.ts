@@ -5,6 +5,7 @@ import Agenda from "agenda";
 import { getTodayBirthdayUsers } from "../repository/UserRepository";
 import { getOffsetHourOnString } from "../helpers/TimeHelper";
 import { sendEmail } from "./nodemailer";
+import { ONE_HOUR_IN_MILLISECOND } from "../constants/scheduler";
 
 const databaseUri = process.env.DATABASE_URI + "member";
 
@@ -14,32 +15,67 @@ const agenda = new Agenda({
 });
 
 agenda.define("addTodaysPushNotifTask", async (job: any) => {
-  const users = await getTodayBirthdayUsers();
+  try {
+    const users = await getTodayBirthdayUsers();
 
-  const schedulerPromises = users.map((user: any) => {
-    const pushNotifTime9UserTimezone = getOffsetHourOnString(
-      user.timezone,
-      user.birthday
-    );
-    return agenda.schedule(
-      pushNotifTime9UserTimezone,
-      "sendEmailToBirthdayUser",
-      {
-        email: user.email,
-        name: user.name,
-        birthday: user.birthday,
+    if (users.length === 0) {
+      console.log("[Agenda] No users with birthdays today.");
+      return;
+    }
+
+    const schedulerPromises = users.map(async (user) => {
+      try {
+        const pushNotifTime9UserTimezone = getOffsetHourOnString(
+          user.timezone,
+          user.birthday
+        );
+
+        await agenda.schedule(
+          pushNotifTime9UserTimezone,
+          "sendEmailToBirthdayUser",
+          {
+            email: user.email,
+            name: user.name,
+            birthday: user.birthday,
+            timestamp: pushNotifTime9UserTimezone,
+          }
+        );
+      } catch (error) {
+        console.error(
+          `Failed to schedule notification for ${user.email}:`,
+          error
+        );
       }
+    });
+
+    await Promise.allSettled(schedulerPromises);
+  } catch (error) {
+    console.error(
+      "[Agenda] Failed to add today's push notification task:",
+      error
     );
-  });
-  await Promise.all(schedulerPromises);
+  }
 });
 
 agenda.define("sendEmailToBirthdayUser", async (job: any) => {
-  sendEmail(
-    job.attrs.data.email,
-    "Happy Birthday!",
-    `Happy birthday ${job.attrs.data.name}, we wish you all the best on your special day!`
-  );
+  try {
+    await sendEmail(
+      job.attrs.data.email,
+      "Happy Birthday!",
+      `Happy birthday ${job.attrs.data.name}, we wish you all the best on your special day!`
+    );
+  } catch (error) {
+    console.error(
+      `[Agenda] Failed to send email to ${job.attrs.data.email}, retrying...`,
+      error
+    );
+
+    await agenda.schedule(
+      job.attrs.data.timestamp + ONE_HOUR_IN_MILLISECOND,
+      "sendEmailToBirthdayUser",
+      job.attrs.data
+    );
+  }
 });
 
 export default agenda;
