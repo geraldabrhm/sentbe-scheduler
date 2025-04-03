@@ -5,6 +5,12 @@ import {
   getOffsetHourOnString,
   isTodayBirthdayUser,
 } from "../helpers/TimeHelper";
+import {
+  addNewUser,
+  deleteUser,
+  getUserByUserId,
+  updateUser,
+} from "../repository/UserRepository";
 
 const SUCCESS_REGISTER_MESSAGE = "User registered successfully";
 const ERROR_COMMON_REGISTER_MESSAGE = "User registration failed";
@@ -17,14 +23,7 @@ export const registerUser = async (
   timezone: string
 ): Promise<ServiceOutput> => {
   try {
-    const user = new User({
-      email,
-      name,
-      birthday,
-      timezone,
-    });
-
-    await user.save();
+    const user = await addNewUser(email, name, birthday, timezone);
 
     const isBirthdayUserToday = isTodayBirthdayUser(
       user.timezone,
@@ -95,7 +94,7 @@ const ERROR_USER_NOT_FOUND_MESSAGE = "User not found";
 
 export const getProfile = async (userId: string): Promise<ServiceOutput> => {
   try {
-    const user = await User.findOne({ userId }).select("-__v -_id");
+    const user = await getUserByUserId(userId);
 
     if (!user) {
       return {
@@ -128,7 +127,7 @@ const ERROR_USER_NOT_FOUND_REMOVE_MESSAGE = "User not found";
 
 export const removeUser = async (userId: string): Promise<ServiceOutput> => {
   try {
-    const user = await User.findOneAndDelete({ userId });
+    const user = await deleteUser(userId);
 
     if (!user) {
       return {
@@ -155,7 +154,7 @@ export const removeUser = async (userId: string): Promise<ServiceOutput> => {
   }
 };
 
-export const updateUser = async (
+export const updateUserService = async (
   userId: string,
   email: string,
   name: string,
@@ -163,11 +162,7 @@ export const updateUser = async (
   timezone: string
 ): Promise<ServiceOutput> => {
   try {
-    const user = await User.findOneAndUpdate(
-      { userId },
-      { email, name, birthday, timezone },
-      { new: true, runValidators: true }
-    ).select("-__v -_id");
+    const user = await updateUser(userId, email, name, birthday, timezone);
 
     if (!user) {
       return {

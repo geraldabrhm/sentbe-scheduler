@@ -1,4 +1,3 @@
-import { mock } from "node:test";
 import {
   registerUserController,
   getProfileController,
@@ -198,13 +197,13 @@ describe("UserController", () => {
         status: 200,
       };
 
-      (UserService.updateUser as jest.Mock).mockResolvedValue(
+      (UserService.updateUserService as jest.Mock).mockResolvedValue(
         mockServiceResponse
       );
 
       await updateUserController(req, res);
 
-      expect(UserService.updateUser).toHaveBeenCalledWith(
+      expect(UserService.updateUserService).toHaveBeenCalledWith(
         "user123",
         "updated@example.com",
         "Updated User",

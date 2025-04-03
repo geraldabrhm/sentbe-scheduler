@@ -1,9 +1,17 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 import { EMAIL_REGEXP } from "../constants/regex";
 import { getTimeZones } from "@vvo/tzdb";
 import moment from "moment";
 
-const UserSchema: Schema = new Schema({
+export interface IUser extends Document {
+  userId: string;
+  email: string;
+  name: string;
+  birthday: string;
+  timezone: string;
+}
+
+const UserSchema: Schema = new Schema<IUser>({
   userId: {
     type: String,
     required: true,
@@ -49,6 +57,6 @@ const UserSchema: Schema = new Schema({
   },
 });
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model<IUser>("User", UserSchema);
 
 export default User;

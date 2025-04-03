@@ -3,7 +3,7 @@ import {
   getProfile,
   registerUser,
   removeUser,
-  updateUser,
+  updateUserService,
 } from "../services/UserService";
 import { MILLISECOND_IN_A_DAY } from "../constants/scheduler";
 
@@ -61,7 +61,7 @@ export const updateUserController = async (req: Request, res: Response) => {
     const userId = req.cookies.userId as string;
     const { email, name, birthday, timezone } = req.body;
 
-    const { success, message, data, status } = await updateUser(
+    const { success, message, data, status } = await updateUserService(
       userId,
       email,
       name,

@@ -5,7 +5,7 @@ import {
   getProfile,
   registerUser,
   removeUser,
-  updateUser,
+  updateUserService,
 } from "../../../services/UserService";
 import agenda from "../../../lib/agenda";
 
@@ -204,7 +204,7 @@ describe("removeUser", () => {
   });
 });
 
-describe("updateUser", () => {
+describe("updateUserService", () => {
   let mongoServer: MongoMemoryServer;
 
   beforeAll(async () => {
@@ -231,7 +231,7 @@ describe("updateUser", () => {
       timezone: "Asia/Jakarta",
     });
 
-    const result = await updateUser(
+    const result = await updateUserService(
       "12345",
       "new@example.com",
       "New Name",
@@ -250,7 +250,7 @@ describe("updateUser", () => {
   });
 
   it("should return 404 if user does not exist", async () => {
-    const result = await updateUser(
+    const result = await updateUserService(
       "nonexistent",
       "new@example.com",
       "New Name",
@@ -263,7 +263,7 @@ describe("updateUser", () => {
   });
 
   it("should return 400 on invalid data format", async () => {
-    const result = await updateUser(
+    const result = await updateUserService(
       "12345",
       "invalid-email",
       "",
