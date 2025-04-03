@@ -1,5 +1,7 @@
 import { getTimeZones } from "@vvo/tzdb";
 import {
+  LEAP_YEAR_DATE,
+  LEAP_YEAR_REPLACEMENT_DATE,
   PUSH_NOTIF_TIME,
   PUSH_NOTIF_TIME_HHMMSS,
 } from "../constants/scheduler";
@@ -53,6 +55,10 @@ const getTodayAndTomorrowDateString = () => {
   };
 };
 
+const isLeapYear = (year: number): boolean => {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+};
+
 const isTodayBirthdayUser = (
   timezone: string,
   birthdayYYYYMMDD: string
@@ -62,11 +68,18 @@ const isTodayBirthdayUser = (
 
   const { today, tomorrow } = getTodayAndTomorrowDateString();
 
+  const isLeapYearBirthday = birthdayYYYYMMDD.endsWith(LEAP_YEAR_DATE);
+  const adjustedBirthday =
+    isLeapYearBirthday && !isLeapYear
+      ? birthdayYYYYMMDD.replace(LEAP_YEAR_DATE, LEAP_YEAR_REPLACEMENT_DATE)
+      : birthdayYYYYMMDD;
+
   if (offsetInHours < PUSH_NOTIF_TIME) {
-    isTodayBirthdayUTCReference = birthdayYYYYMMDD === today;
+    isTodayBirthdayUTCReference = adjustedBirthday === today;
   } else {
-    isTodayBirthdayUTCReference = birthdayYYYYMMDD === tomorrow;
+    isTodayBirthdayUTCReference = adjustedBirthday === tomorrow;
   }
+
   return isTodayBirthdayUTCReference;
 };
 
