@@ -11,10 +11,19 @@ import {
   getUserByUserId,
   updateUser,
 } from "../repository/UserRepository";
-
-const SUCCESS_REGISTER_MESSAGE = "User registered successfully";
-const ERROR_COMMON_REGISTER_MESSAGE = "User registration failed";
-const ERROR_DUPLICATE_EMAIL_MESSAGE = "Email already exists";
+import {
+  ERROR_COMMON_GET_PROFILE_MESSAGE,
+  ERROR_COMMON_REGISTER_MESSAGE,
+  ERROR_COMMON_REMOVE_USER_MESSAGE,
+  ERROR_COMMON_UPDATE_USER_MESSAGE,
+  ERROR_DUPLICATE_EMAIL_MESSAGE,
+  ERROR_INVALID_DATA_FORMAT,
+  ERROR_USER_NOT_FOUND_MESSAGE,
+  SUCCESS_GET_PROFILE_MESSAGE,
+  SUCCESS_REGISTER_MESSAGE,
+  SUCCESS_REMOVE_USER_MESSAGE,
+  SUCCESS_UPDATE_USER_MESSAGE,
+} from "../constants/serviceResponseMessage";
 
 export const registerUser = async (
   email: string,
@@ -88,10 +97,6 @@ export const registerUser = async (
   }
 };
 
-const SUCCESS_GET_PROFILE_MESSAGE = "User profile retrieved successfully";
-const ERROR_COMMON_GET_PROFILE_MESSAGE = "Error retrieving user profile";
-const ERROR_USER_NOT_FOUND_MESSAGE = "User not found";
-
 export const getProfile = async (userId: string): Promise<ServiceOutput> => {
   try {
     const user = await getUserByUserId(userId);
@@ -121,10 +126,6 @@ export const getProfile = async (userId: string): Promise<ServiceOutput> => {
   }
 };
 
-const SUCCESS_REMOVE_USER_MESSAGE = "User removed successfully";
-const ERROR_COMMON_REMOVE_USER_MESSAGE = "Error removing user";
-const ERROR_USER_NOT_FOUND_REMOVE_MESSAGE = "User not found";
-
 export const removeUser = async (userId: string): Promise<ServiceOutput> => {
   try {
     const user = await deleteUser(userId);
@@ -132,7 +133,7 @@ export const removeUser = async (userId: string): Promise<ServiceOutput> => {
     if (!user) {
       return {
         success: false,
-        message: ERROR_USER_NOT_FOUND_REMOVE_MESSAGE,
+        message: ERROR_USER_NOT_FOUND_MESSAGE,
         data: null,
         status: 404,
       };
@@ -167,7 +168,7 @@ export const updateUserService = async (
     if (!user) {
       return {
         success: false,
-        message: "User not found",
+        message: ERROR_USER_NOT_FOUND_MESSAGE,
         data: null,
         status: 404,
       };
@@ -175,7 +176,7 @@ export const updateUserService = async (
 
     return {
       success: true,
-      message: "User updated successfully",
+      message: SUCCESS_UPDATE_USER_MESSAGE,
       data: user,
       status: 200,
     };
@@ -183,7 +184,7 @@ export const updateUserService = async (
     if (error instanceof Error && error.name === "CastError") {
       return {
         success: false,
-        message: "Invalid data format",
+        message: ERROR_INVALID_DATA_FORMAT,
         data: null,
         status: 400,
       };
@@ -208,7 +209,7 @@ export const updateUserService = async (
     } else {
       return {
         success: false,
-        message: "Error updating user",
+        message: ERROR_COMMON_UPDATE_USER_MESSAGE,
         data: null,
         status: 500,
       };
