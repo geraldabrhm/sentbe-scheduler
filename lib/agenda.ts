@@ -3,9 +3,7 @@ dotenv.config();
 
 import Agenda from "agenda";
 import { getTodayBirthdayUsers } from "../repository/UserRepository";
-import {
-  getOffsetHourOnString,
-} from "../helpers/TimeHelper";
+import { getOffsetHourOnString } from "../helpers/TimeHelper";
 import { sendEmail } from "./nodemailer";
 
 const databaseUri = process.env.DATABASE_URI + "member";
@@ -18,12 +16,12 @@ const agenda = new Agenda({
 agenda.define("addTodaysPushNotifTask", async (job: any) => {
   const users = await getTodayBirthdayUsers();
 
-  users.forEach(async (user: any) => {
+  const schedulerPromises = users.map((user: any) => {
     const pushNotifTime9UserTimezone = getOffsetHourOnString(
       user.timezone,
       user.birthday
     );
-    await agenda.schedule(
+    return agenda.schedule(
       pushNotifTime9UserTimezone,
       "sendEmailToBirthdayUser",
       {
@@ -33,6 +31,7 @@ agenda.define("addTodaysPushNotifTask", async (job: any) => {
       }
     );
   });
+  await Promise.all(schedulerPromises);
 });
 
 agenda.define("sendEmailToBirthdayUser", async (job: any) => {
